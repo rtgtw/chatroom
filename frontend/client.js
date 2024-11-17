@@ -2,15 +2,17 @@ import { WebSocket } from "ws";
 import readline from "readline";
 
 
-//create a readline interface
+//create a readline interface for i/o
 const rl = readline.createInterface({
-    input:process.stdin,
-    output:process.stdout
+    input: process.stdin,
+    output: process.stdout
 });
+
 
 //create a websocket connecting to localhost
 const socket = new WebSocket("ws://localhost:8080");
 
+//initialize current room to null
 let currentRoom = null;
 
 socket.onopen = () => {
@@ -19,11 +21,11 @@ socket.onopen = () => {
 
     rl.on("line", (input) => {
 
-        if (input === "exit"){
+        if (input === "exit") {
             console.log("Closing connection");
             socket.close(1000, "Client requested closure");
-            r1.close();
-        }else{
+            rl.close();
+        } else {
             socket.send(input);
         }
     });
