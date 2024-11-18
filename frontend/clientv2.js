@@ -46,7 +46,7 @@ function sendMessage(){
     }
 }
 
-//add an avent listener to the input box for if the user hits enter
+//add an event listener to the input box for if the user hits enter
 //messageInput is the input box
 messageInput.addEventListener("keydown", (event) =>{
     if(event.key === "Enter"){
