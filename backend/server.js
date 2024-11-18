@@ -175,7 +175,7 @@ wss.on("connection", (ws) => {
             const potentialClient = Array.from(wss.clients).find((client) => { return client !== ws && client.clientId === clientId });
 
             //They are currently inside of a private room, disconnect the second person before connecting
-            if (potentialClient.currentRoom?.startsWith("private")) {
+            if (potentialClient?.currentRoom?.startsWith("private")) {
 
                 potentialClient.oldRoom = potentialClient.currentRoom;
 
@@ -379,6 +379,6 @@ wss.on("connection", (ws) => {
 });
 
 //have the server listen
-server.listen(ENV_VARS.PORT, () => {
+server.listen(ENV_VARS.PORT, "0.0.0.0" ,() => {
     console.log(`Websocket server running on ws://localhost:${ENV_VARS.PORT}`);
 });

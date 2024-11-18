@@ -19,6 +19,6 @@ const port = 3000;
 app.use(express.static(path.join(__dirname)));
 
 //listen on port 3k
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
     console.log("Front end hosting server listening on port 3000");
 })

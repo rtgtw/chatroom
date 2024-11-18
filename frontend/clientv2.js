@@ -1,7 +1,7 @@
 //client side js to interact with html ui
 
 //connect to backend websocket server
-const socket = new WebSocket("ws://localhost:8080");
+const socket = new WebSocket("ws://192.168.87.24:8080");
 
 
 //get references by dom eleements
