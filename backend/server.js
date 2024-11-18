@@ -1,6 +1,7 @@
 import { createServer } from "http";
 import WebSocket, { WebSocketServer } from "ws";
 import { ENV_VARS } from "./config.js";
+import { parse } from "path";
 
 
 //create http server object
@@ -252,6 +253,52 @@ wss.on("connection", (ws) => {
 
         }
 
+        else if(parsedMessage.startsWith("EXIT") || parsedMessage.startsWith("exit")){
+            console.log("A client has disconneted");
+
+        //notify the room someone left
+        if (ws.currentRoom && rooms.has(ws.currentRoom)) {
+            rooms.get(ws.currentRoom).forEach((client) => {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send(`A user has left ${ws.currentRoom}`);
+                }
+            });
+        }
+
+
+        //remove the client from its current room
+        if (ws.currentRoom && rooms.has(ws.currentRoom)) {
+
+            let currentRoom = ws.currentRoom;
+
+            //checking to see if the client who left was in a private or group room before leaving
+            //pass the expression into private room
+            const privateRoom = ws.currentRoom.startsWith("private") ? true : false;
+
+            //remove client from the current room
+            rooms.get(ws.currentRoom).delete(ws);
+
+            ws.currentRoom = null;
+            
+
+
+            //clean up
+            //if they were the last one, delete the room
+            if (rooms.get(currentRoom).size === 0) {
+                rooms.delete(currentRoom);
+
+            }
+
+            //if its a private room, make the other clients currentRoom null
+            if (privateRoom) {
+                rooms.get(currentRoom)?.forEach((client) => {
+                    client.currentRoom = null;
+                })
+            }
+        }
+        }
+        ////
+
         //broadcast the messages to everyone in the chatroom
         //if currentRoom is truthy(not null) and its within the map
         else if (ws.currentRoom && rooms.has(ws.currentRoom)) {
@@ -259,13 +306,15 @@ wss.on("connection", (ws) => {
 
                 //while iterating, make sure youre not echoing the message back to sender, and 
                 //the connection is open for the other sockets
-                if (client !== ws && client.readyState === WebSocket.OPEN) {
+                //* update, showing the clients name in the chat as well, removed client !== ws
+                if (client.readyState === WebSocket.OPEN) {
                     client.send(`${client.currentRoom}(${ws.clientId}): ${parsedMessage}`);
                 }
             });
 
-        } else {
-            ws.send(`You must join a room or pair with another cleint to send messages\n\nhere is a list of people who are currently in the server: `);
+        } 
+        else {
+            ws.send(`You must join a room or pair with another client to send messages\n\nhere is a list of people who are currently in the server: `);
 
             //showing all other users who are currently within the server
             wss.clients.forEach((client) => {
@@ -315,7 +364,7 @@ wss.on("connection", (ws) => {
 
             //if its a private room, make the other clients currentRoom null
             if (privateRoom) {
-                rooms.get(currentRoom).forEach((client) => {
+                rooms.get(currentRoom)?.forEach((client) => {
                     client.currentRoom = null;
                 })
             }
