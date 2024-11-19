@@ -1,7 +1,14 @@
 import WebSocket from "ws";
 
+/**
+ * Broadcasts a message to everyone in ws(inbound websocket)'s current room location
+ * @param {Object} ws
+ * @param {Map<string,Set>} rooms
+ * @param {string} message
+ */
 //template to broadcast anything to the group
 export const notify = (ws, rooms, message) => {
+    
     if (ws.currentRoom && rooms.has(ws.currentRoom)) {
         rooms.get(ws.currentRoom).forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
@@ -10,6 +17,7 @@ export const notify = (ws, rooms, message) => {
         });
     }
 };
+
 
 export const broadcastMessage = (rooms, ws, parsedMessage) => {
     rooms.get(ws.currentRoom).forEach((client) => {
